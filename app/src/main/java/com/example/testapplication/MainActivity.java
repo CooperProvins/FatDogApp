@@ -25,6 +25,13 @@ public class MainActivity extends AppCompatActivity {
     private int slide = 0;
     private String gender = "Male";
 
+    int dogWeight;
+    Sex dogSex;
+    String dogBreedInput;
+    double percentile;
+
+    DogBreed dogBreed;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        DogReader.initialize();
 
         String[] fruits = {"Select a Fruit", "Apple", "Orange", "Grape", "Banana", "Apple", "Orange", "Grape", "Banana","Apple", "Orange", "Grape", "Banana", "Cherry", "Mango", "Peach"};
 
@@ -47,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
-                fruits
+                DogReader.getDogBreeds().toArray()
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
