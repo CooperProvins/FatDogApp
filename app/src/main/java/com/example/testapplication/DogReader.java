@@ -1,7 +1,7 @@
 package com.example.testapplication;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import android.content.Context;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -20,15 +20,19 @@ public class DogReader {
     /**
      * Method to setup scanner object and read csv and parse into dodBreeds list
      */
-    public static void initialize(){
+    public static void initialize(Context context){
         try {
-            scanner = new Scanner(new File(fileName));
+            InputStream is = context.getAssets().open(fileName);
+            scanner = new Scanner(is);
         }
-        catch (FileNotFoundException e){
+        catch (Exception e){
             scanner = null;
+            return;
         }
-        header = scanner.nextLine();
-        while (scanner.hasNext()){
+        if (scanner.hasNextLine()) {
+            header = scanner.nextLine();
+        }
+        while (scanner != null && scanner.hasNext()){
             String[] parts = scanner.nextLine().split(",");
             DogBreed dogBreed = new DogBreed(
                     parts[0],
