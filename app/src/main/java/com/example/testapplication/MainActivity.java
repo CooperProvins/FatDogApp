@@ -1,6 +1,8 @@
 package com.example.testapplication;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         int breedCount = DogReader.getDogBreeds().size();
         String[] dogNames = new String[breedCount];
-        for (int i = 0; i < breedCount; i++){
+        for (int i = 0; i < breedCount; i++) {
             dogNames[i] = DogReader.getDogBreeds().get(i).getName();
         }
 
@@ -55,11 +57,59 @@ public class MainActivity extends AppCompatActivity {
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+        weightText.setText(String.valueOf(weightSelector.getProgress()));
+
         dogSelector.setAdapter(adapter);
 
-        void updatePercentage() {
+        genderButton.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
+            @Override
+            public void onButtonChecked(MaterialButtonToggleGroup materialButtonToggleGroup, int i, boolean b) {
+                if (i == R.id.buttonFemale){
+                    dogSex = Sex.FEMALE;
+                }
+                else if (i == R.id.buttonMale){
+                    dogSex = Sex.MALE;
+                }
+                updateInfo(bigPercentage);
+            }
+        });
+        weightSelector.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                weightText.setText(String.valueOf(weightSelector.getProgress()));
+                dogWeight = weightSelector.getProgress();
+                updateInfo(bigPercentage);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        dogSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                updateInfo(bigPercentage);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        if (dogSelector.getSelectedItem() != null) {
             myBreed = DogReader.findDogBreed(dogSelector.getSelectedItem().toString());
-            bigPercentage =
         }
+
+    }
+    private void updateInfo(TextView bigPercentage){
+        percentile = myBreed.weightPercentile(dogSex, dogWeight);
+        bigPercentage.setText(String.valueOf(percentile));
     }
 }
