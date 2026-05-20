@@ -61,13 +61,11 @@ public class MainActivity extends AppCompatActivity {
 
         dogSelector.setAdapter(adapter);
 
-        genderButton.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
-            @Override
-            public void onButtonChecked(MaterialButtonToggleGroup materialButtonToggleGroup, int i, boolean b) {
-                if (i == R.id.buttonFemale){
+        genderButton.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                if (checkedId == R.id.buttonFemale) {
                     dogSex = Sex.FEMALE;
-                }
-                else if (i == R.id.buttonMale){
+                } else if (checkedId == R.id.buttonMale) {
                     dogSex = Sex.MALE;
                 }
                 updateInfo(bigPercentage);
@@ -76,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
         weightSelector.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                weightText.setText(String.valueOf(weightSelector.getProgress()));
-                dogWeight = weightSelector.getProgress();
+                dogWeight = (int)(Math.pow(weightSelector.getProgress(),2)*0.02);
+                weightText.setText(String.valueOf(dogWeight));
                 updateInfo(bigPercentage);
             }
 
@@ -95,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         dogSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                myBreed = DogReader.findDogBreed(parent.getItemAtPosition(position).toString());
                 updateInfo(bigPercentage);
             }
 
@@ -103,13 +102,21 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        // Initialize variables with defaults
+        dogWeight = weightSelector.getProgress();
+        dogSex = Sex.MALE; // Default selection
+
         if (dogSelector.getSelectedItem() != null) {
             myBreed = DogReader.findDogBreed(dogSelector.getSelectedItem().toString());
         }
 
+        updateInfo(bigPercentage);
     }
     private void updateInfo(TextView bigPercentage){
-        percentile = myBreed.weightPercentile(dogSex, dogWeight);
-        bigPercentage.setText(String.valueOf(percentile));
+        if (myBreed != null && dogSex != null) {
+            percentile = myBreed.weightPercentile(dogSex, dogWeight);
+            bigPercentage.setText(String.format("%.2f", percentile*100)+"%");
+        }
     }
 }
